@@ -1,1 +1,4 @@
 ENV
+.project
+.pydevproject
+*.pyc
