@@ -28,6 +28,7 @@ def get_setting(config, site, setting):
         exit(1)
     return value
 
+
 def get_setting_with_default(config, site, setting, default):
     value = config.get(site, setting)
     if not value:
