@@ -3,7 +3,7 @@ from __future__ import print_function
 import datetime
 import sys
 from argparse import ArgumentParser
-from ConfigParser import ConfigParser
+from ConfigParser import ConfigParser, ParsingError
 from os.path import expanduser
 
 from pygerrit2.rest import GerritRestAPI
@@ -37,7 +37,11 @@ def get_setting_with_default(config, site, setting, default):
 
 
 config = ConfigParser()
-config.read(['mongo-gerrit.ini', expanduser('~/mongo-gerrit.ini')])
+try:
+    config.read(['mongo-gerrit.ini', expanduser('~/mongo-gerrit.ini')])
+except ParsingError as e:
+    print("error reading config: %s" % e, file=sys.stderr)
+    exit(1)
 
 parser = ArgumentParser()
 parser.add_argument("site", help="Name of the Gerrit site to sync")
