@@ -19,6 +19,22 @@ AUTH_METHODS = {
     'digest': HTTPDigestAuthFromNetrc
 }
 
+
+def get_setting(config, site, setting):
+    value = config.get(site, setting)
+    if not value:
+        print("missing setting %d for site %d" % (setting, site),
+              file=sys.stderr)
+        exit(1)
+    return value
+
+def get_setting_with_default(config, site, setting, default):
+    value = config.get(site, setting)
+    if not value:
+        value = default
+    return value
+
+
 config = ConfigParser()
 config.read(['mongo-gerrit.ini', expanduser('~/mongo-gerrit.ini')])
 
@@ -31,8 +47,8 @@ if not config.has_section(site):
     print("no config for site %s" % site, file=sys.stderr)
     exit(1)
 
-url = config.get(site, 'url')
-auth = config.get(site, 'auth')
+url = get_setting(config, site, 'url')
+auth = get_setting_with_default(config, site, 'auth', 'digest')
 if auth not in AUTH_METHODS:
     print("invalid authentication method %s" % auth, file=sys.stderr)
     exit(1)
