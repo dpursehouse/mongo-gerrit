@@ -21,11 +21,14 @@ AUTH_METHODS = {
 CONFIG_FILENAME = 'mongo-gerrit.yml'
 
 
+def fatal(message):
+    print(message, file=sys.stderr)
+    sys.exit(1)
+
+
 def get_setting(config, site, setting):
     if setting not in config['sites'][site]:
-        print("missing setting %d for site %d" % (setting, site),
-              file=sys.stderr)
-        exit(1)
+        fatal("missing setting %d for site %d" % (setting, site))
     return config['sites'][site][setting]
 
 
@@ -39,19 +42,16 @@ config_file = CONFIG_FILENAME
 if not isfile(config_file):
     config_file = join(expanduser('~'), CONFIG_FILENAME)
     if not isfile(config_file):
-        print('no config file', file=sys.stderr)
-        exit(1)
+        fatal('no config file')
 
 try:
     with open("mongo-gerrit.yml") as f:
         config = yaml.load(f)
 except Exception as e:
-    print('error opening config file: %s' % e, file=sys.stderr)
-    exit(1)
+    fatal('error opening config file: %s' % e)
 
 if "sites" not in config:
-    print("no sites configured", file=sys.stderr)
-    exit(1)
+    fatal("no sites configured")
 
 parser = ArgumentParser()
 parser.add_argument("site", help="Name of the Gerrit site to sync")
@@ -59,14 +59,12 @@ args = parser.parse_args()
 
 site = args.site
 if site not in config['sites']:
-    print("no config for site %s" % site, file=sys.stderr)
-    exit(1)
+    fatal("no config for site %s" % site)
 
 url = get_setting(config, site, 'url')
 auth = get_setting_with_default(config, site, 'auth', 'digest')
 if auth not in AUTH_METHODS:
-    print("invalid authentication method %s" % auth, file=sys.stderr)
-    exit(1)
+    fatal("invalid authentication method %s" % auth)
 
 gerrit = GerritRestAPI(url=url, auth=AUTH_METHODS[auth](url=url))
 db = GerritMongoDatabase(name=site)
