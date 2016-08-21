@@ -3,9 +3,9 @@ from __future__ import print_function
 import datetime
 import sys
 from argparse import ArgumentParser
-from ConfigParser import ConfigParser, ParsingError
-from os.path import expanduser
+from os.path import expanduser, isfile, join
 
+import yaml
 from pygerrit2.rest import GerritRestAPI
 from pygerrit2.rest.auth import HTTPBasicAuthFromNetrc, HTTPDigestAuthFromNetrc
 
@@ -18,29 +18,39 @@ AUTH_METHODS = {
     'basic': HTTPBasicAuthFromNetrc,
     'digest': HTTPDigestAuthFromNetrc
 }
+CONFIG_FILENAME = 'mongo-gerrit.yml'
 
 
 def get_setting(config, site, setting):
-    value = config.get(site, setting)
-    if not value:
+    if setting not in config['sites'][site]:
         print("missing setting %d for site %d" % (setting, site),
               file=sys.stderr)
         exit(1)
-    return value
+    return config['sites'][site][setting]
 
 
 def get_setting_with_default(config, site, setting, default):
-    value = config.get(site, setting)
-    if not value:
-        value = default
-    return value
+    if setting in config['sites'][site]:
+        return config['sites'][site][setting]
+    return default
 
 
-config = ConfigParser()
+config_file = CONFIG_FILENAME
+if not isfile(config_file):
+    config_file = join(expanduser('~'), CONFIG_FILENAME)
+    if not isfile(config_file):
+        print('no config file', file=sys.stderr)
+        exit(1)
+
 try:
-    config.read(['mongo-gerrit.ini', expanduser('~/mongo-gerrit.ini')])
-except ParsingError as e:
-    print("error reading config: %s" % e, file=sys.stderr)
+    with open("mongo-gerrit.yml") as f:
+        config = yaml.load(f)
+except Exception as e:
+    print('error opening config file: %s' % e, file=sys.stderr)
+    exit(1)
+
+if "sites" not in config:
+    print("no sites configured", file=sys.stderr)
     exit(1)
 
 parser = ArgumentParser()
@@ -48,7 +58,7 @@ parser.add_argument("site", help="Name of the Gerrit site to sync")
 args = parser.parse_args()
 
 site = args.site
-if not config.has_section(site):
+if site not in config['sites']:
     print("no config for site %s" % site, file=sys.stderr)
     exit(1)
 

@@ -29,14 +29,14 @@ $ source ./ENV/bin/activate
 
 ## Configuration
 
-Configuration is done in a Windows-style .ini file named `mongo-gerrit.ini`
-which may be located in the current directory or in the user's home folder.
+Configuration is done in a YAML file named `mongo-gerrit.yml` which may be
+located either in the current directory or in the user's home folder.
 
-Multiple Gerrit servers may be configured in multiple sections identified by
-a `[section]` header. The name of the section corresponds to the name of the
-database in MongoDB.
+Multiple Gerrit servers may be configured in multiple blocks under the
+`sites` section. The name of the site is used as the name of the database in
+MongoDB.
 
-Within each section, the following settings are recognised:
+Within each site section, the following settings are recognised:
 
 - `url`: Required. The fully qualified URL to the Gerrit server.
 - `auth`: Optional. Authentication type. May be `digest` or `basic`. Defaults to
@@ -63,7 +63,7 @@ sync will be fetched.
 - It's not possible to connect to MongoDB on any address other than the
 default `localhost:27017`.
 
-- Review data does not include file informaton as its format is not
+- Review data does not include file information as its format is not
 accepted by MongoDB.
 
 - It's not possible to provide arbitrary queries to limit the results that

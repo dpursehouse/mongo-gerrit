@@ -1,0 +1,8 @@
+---
+sites:
+ gerrit-review:
+   url: https://gerrit-review.googlesource.com
+   auth: basic
+ android-review:
+   url: https://android-review.googlesource.com
+   auth: basic
