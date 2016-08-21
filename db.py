@@ -2,8 +2,8 @@ from pymongo import MongoClient, ASCENDING
 
 
 class GerritMongoDatabase:
-    def __init__(self, name):
-        client = MongoClient()
+    def __init__(self, name, host, port):
+        client = MongoClient(host=host, port=port)
         self.name = name
         db = client[self.name]
         self.changes = db.changes

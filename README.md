@@ -9,8 +9,8 @@ mongo-gerrit is a Python library to sync review data from a
 mongo-gerrit has been developed on OSX with Python 2.7. It should also work
 on other platforms, but has not been tested. Python 3 is not supported.
 
-It is assumed that a MongoDB instance is running on the default host and
-port (`localhost:27017`).
+It is assumed that a MongoDB instance is running. If it's not running on the
+default host and port (`localhost:27017`), this can be specified.
 
 ## Installation
 
@@ -58,10 +58,11 @@ long time on servers with a large number of changes.
 On subsequent runs, only the changes that have been updated since the previous
 sync will be fetched.
 
-## Limitations, known problems, TODOs
+By default mongo-gerrit connects to MongoDB on the default hostname and
+port (`localhost:27017`). Use `--database-hostname` and `--database-port` to
+use a different location.
 
-- It's not possible to connect to MongoDB on any address other than the
-default `localhost:27017`.
+## Limitations, known problems, TODOs
 
 - Review data does not include file information as its format is not
 accepted by MongoDB.

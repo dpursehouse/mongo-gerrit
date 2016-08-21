@@ -55,6 +55,11 @@ if "sites" not in config:
 
 parser = ArgumentParser()
 parser.add_argument("site", help="Name of the Gerrit site to sync")
+group = parser.add_argument_group("database")
+group.add_argument("--database-hostname", action="store", default="localhost",
+                   dest="host", metavar="HOSTNAME", help="MongoDB hostname")
+group.add_argument("--database-port", action="store", default=27017, type=int,
+                   dest="port", metavar="PORT", help="MongoDB port")
 args = parser.parse_args()
 
 site = args.site
@@ -67,7 +72,7 @@ if auth not in AUTH_METHODS:
     fatal("invalid authentication method %s" % auth)
 
 gerrit = GerritRestAPI(url=url, auth=AUTH_METHODS[auth](url=url))
-db = GerritMongoDatabase(name=site)
+db = GerritMongoDatabase(name=site, host=args.host, port=args.port)
 
 last_update = db.get_last_update()
 if last_update:
