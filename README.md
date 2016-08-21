@@ -42,12 +42,15 @@ settings:
    - OPTION_NAME
    - OPTION_NAME
    - ...
+ query-batch-size: 1000
 ```
 
 - `query-options`: Options to be passed to Gerrit's [change query REST API]
 (https://gerrit-documentation.storage.googleapis.com/Documentation/2.12.3/rest-api-changes.html#list-changes).
 If not set, defaults to include almost all options (as arbitrarily decided by
 the author). May be overridden per site.
+- `query-batch-size`: Number of changes to query per batch. If not set, defaults
+to 500. May be overridden per site.
 
 ### Gerrit server settings
 
@@ -62,6 +65,7 @@ sites:
    query-options:
      - OPTION_NAME
      - OPTION_NAME
+   query-batch-size: 300
 ```
 
 - `site-name`: Unique identifier for this site. This will be used as the
@@ -71,6 +75,10 @@ database name in MongoDb.
 `digest` if not specified.
 - `query-options`: Optional. If specified, overrides the options defined in
 the global settings.
+- `query-batch-size`: Optional. If specified, overrides the value in the
+global settings. This should not be set to a value the exceeds the [query limit]
+(https://gerrit-documentation.storage.googleapis.com/Documentation/2.12.3/access-control.html#capability_queryLimit)
+configured on the server.
 
 The `mongo-gerrit.yml` file included in the repository defines configurations
 for [gerrit-review](https://gerrit-review.googlesource.com) and

@@ -13,6 +13,7 @@ from db import GerritMongoDatabase
 
 DEFAULT_QUERY_OPTIONS = ['DETAILED_LABELS', 'ALL_REVISIONS', 'ALL_COMMITS',
                          'DETAILED_ACCOUNTS', 'MESSAGES', 'COMMIT_FOOTERS']
+DEFAULT_QUERY_BATCH_SIZE = 500
 AUTH_METHODS = {
     'basic': HTTPBasicAuthFromNetrc,
     'digest': HTTPDigestAuthFromNetrc
@@ -81,6 +82,8 @@ if auth not in AUTH_METHODS:
 query_options = get_optional_setting(config, site,
                                      'query-options',
                                      DEFAULT_QUERY_OPTIONS)
+batch_size = get_optional_setting(config, site, 'query-batch-size',
+                                  DEFAULT_QUERY_BATCH_SIZE)
 
 gerrit = GerritRestAPI(url=url, auth=AUTH_METHODS[auth](url=url))
 db = GerritMongoDatabase(name=site, host=args.host, port=args.port)
@@ -94,11 +97,10 @@ else:
 term_string = "?q=" + "+".join(terms)
 start_time = datetime.datetime.utcnow()
 start = 0
-limit = 300
 more_changes = True
 while more_changes:
     query = "&".join([term_string] +
-                     ["S=%d" % start, "n=%d" % limit] +
+                     ["S=%d" % start, "n=%d" % batch_size] +
                      ["o=%s" % o for o in query_options])
     logging.debug(query)
 
@@ -110,7 +112,7 @@ while more_changes:
             print(change['id'])
             db.update_change(change)
         more_changes = '_more_changes' in results[-1]
-        start += limit
+        start += batch_size
     else:
         more_changes = False
 
