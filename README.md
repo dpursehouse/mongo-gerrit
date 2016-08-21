@@ -33,16 +33,25 @@ Configuration is done in a YAML file named `mongo-gerrit.yml` which may be
 located either in the current directory or in the user's home folder.
 
 Multiple Gerrit servers may be configured in multiple blocks under the
-`sites` section. The name of the site is used as the name of the database in
-MongoDB.
+`sites` section.
 
-Within each site section, the following settings are recognised:
+```yaml
+---
+sites:
+ site-name:
+   url: https://example.com/review/
+   auth: basic
+```
 
+- `site-name`: Unique identifier for this site. This will be used as the
+database name in MongoDb.
 - `url`: Required. The fully qualified URL to the Gerrit server.
 - `auth`: Optional. Authentication type. May be `digest` or `basic`. Defaults to
 `digest` if not specified.
 
-Configuration is provided for gerrit-review and android-review.
+The `mongo-gerrit.yml` file included in the repository defines configurations
+for [gerrit-review](https://gerrit-review.googlesource.com) and
+[android-review](https://android-review.googlesource.com).
 
 ## Usage
 
