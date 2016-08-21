@@ -52,9 +52,9 @@ FORMAT = '%(asctime)-15s [%(levelname)s] %(message)s'
 level = logging.DEBUG if args.verbose else logging.INFO
 logging.basicConfig(format=FORMAT, level=level)
 
-config_file = CONFIG_FILENAME
+config_file = join(expanduser('~'), CONFIG_FILENAME)
 if not isfile(config_file):
-    config_file = join(expanduser('~'), CONFIG_FILENAME)
+    config_file = CONFIG_FILENAME
     if not isfile(config_file):
         fatal('no config file')
 

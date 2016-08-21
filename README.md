@@ -30,7 +30,7 @@ $ source ./ENV/bin/activate
 ## Configuration
 
 Configuration is done in a YAML file named `mongo-gerrit.yml` which may be
-located either in the current directory or in the user's home folder.
+located either in the user's home folder or the current directory.
 
 Multiple Gerrit servers may be configured in multiple blocks under the
 `sites` section.
