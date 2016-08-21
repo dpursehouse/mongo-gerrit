@@ -86,7 +86,11 @@ query_options = get_optional_setting(config, site,
 batch_size = get_optional_setting(config, site, 'query-batch-size',
                                   DEFAULT_QUERY_BATCH_SIZE)
 
-gerrit = GerritRestAPI(url=url, auth=AUTH_METHODS[auth](url=url))
+try:
+    gerrit = GerritRestAPI(url=url, auth=AUTH_METHODS[auth](url=url))
+except ValueError as e:
+    fatal("unable to configure Gerrit API: %s" % e)
+
 db = GerritMongoDatabase(name=site, host=args.host, port=args.port)
 
 last_update = db.get_last_update()
