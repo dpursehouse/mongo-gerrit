@@ -8,6 +8,7 @@ settings:
     - MESSAGES
     - COMMIT_FOOTERS
   query-batch-size: 500
+  default-query: "age:1day"
 sites:
  gerrit-review:
    url: https://gerrit-review.googlesource.com

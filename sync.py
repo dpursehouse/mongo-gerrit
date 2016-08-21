@@ -14,6 +14,7 @@ from db import GerritMongoDatabase
 DEFAULT_QUERY_OPTIONS = ['DETAILED_LABELS', 'ALL_REVISIONS', 'ALL_COMMITS',
                          'DETAILED_ACCOUNTS', 'MESSAGES', 'COMMIT_FOOTERS']
 DEFAULT_QUERY_BATCH_SIZE = 500
+DEFAULT_QUERY = "age:1day"
 AUTH_METHODS = {
     'basic': HTTPBasicAuthFromNetrc,
     'digest': HTTPDigestAuthFromNetrc
@@ -92,7 +93,11 @@ last_update = db.get_last_update()
 if last_update:
     terms = ["since:\"%s\"" % last_update]
 else:
-    terms = ["age:1day"]
+    default_query = get_optional_setting(config, site,
+                                         'default-query', DEFAULT_QUERY)
+    if not default_query:
+        fatal('no default query configured')
+    terms = [default_query]
 
 term_string = "?q=" + "+".join(terms)
 start_time = datetime.datetime.utcnow()

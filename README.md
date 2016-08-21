@@ -43,6 +43,7 @@ settings:
    - OPTION_NAME
    - ...
  query-batch-size: 1000
+ default-query: "age:1day"
 ```
 
 - `query-options`: Options to be passed to Gerrit's [change query REST API]
@@ -51,6 +52,8 @@ If not set, defaults to include almost all options (as arbitrarily decided by
 the author). May be overridden per site.
 - `query-batch-size`: Number of changes to query per batch. If not set, defaults
 to 500. May be overridden per site.
+- `default-query`: Default query to use on initial sync. If not set, defaults
+to `age:1day`.
 
 ### Gerrit server settings
 
@@ -66,6 +69,7 @@ sites:
      - OPTION_NAME
      - OPTION_NAME
    query-batch-size: 300
+   default-query: "owner:self"
 ```
 
 - `site-name`: Unique identifier for this site. This will be used as the
@@ -79,6 +83,8 @@ the global settings.
 global settings. This should not be set to a value that exceeds the [query limit]
 (https://gerrit-documentation.storage.googleapis.com/Documentation/2.12.3/access-control.html#capability_queryLimit)
 configured on the server.
+- `default-query`: Optional. If specified, overrides the value in the global
+settings.
 
 The `mongo-gerrit.yml` file included in the repository defines configurations
 for [gerrit-review](https://gerrit-review.googlesource.com) and
@@ -92,8 +98,8 @@ To sync review data from the site identified as `gerrit-review`:
 (ENV) $ python sync.py gerrit-review
 ```
 
-On the first run all changes older than one day are fetched. This may take a
-long time on servers with a large number of changes.
+On the first run all changes found by the default query are fetched. This may take
+a long time if the query results in a large number of changes.
 
 On subsequent runs, only the changes that have been updated since the previous
 sync will be fetched.
