@@ -53,7 +53,9 @@ settings:
 
 - `query-options`: Options to be passed to Gerrit's [change query REST API]
 (https://gerrit-documentation.storage.googleapis.com/Documentation/2.12.3/rest-api-changes.html#list-changes).
-If not set, defaults to include almost all available options.
+If not set, defaults to include almost all available options. The options
+`CURRENT_FILES` and `ALL_FILES` are not supported; if these are given, they
+will not be used.
 - `query-batch-size`: Number of changes to query per batch. This should not be
 set to a value that exceeds the [query limit]
 (https://gerrit-documentation.storage.googleapis.com/Documentation/2.12.3/access-control.html#capability_queryLimit)
@@ -107,9 +109,6 @@ port (`localhost:27017`). Use `--database-hostname` and `--database-port` to
 use a different location.
 
 ## Limitations, known problems, TODOs
-
-- Review data does not include file information as its format is not
-accepted by MongoDB.
 
 - It's not possible to provide arbitrary queries to limit the results that
 are returned.

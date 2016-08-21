@@ -13,6 +13,7 @@ from db import GerritMongoDatabase
 
 DEFAULT_QUERY_OPTIONS = ['DETAILED_LABELS', 'ALL_REVISIONS', 'ALL_COMMITS',
                          'DETAILED_ACCOUNTS', 'MESSAGES', 'COMMIT_FOOTERS']
+UNSUPPORTED_OPTIONS = ['CURRENT_FILES', 'ALL_FILES']
 DEFAULT_QUERY_BATCH_SIZE = 500
 DEFAULT_QUERY = "age:1day"
 AUTH_METHODS = {
@@ -83,6 +84,13 @@ if auth not in AUTH_METHODS:
 query_options = get_optional_setting(config, site,
                                      'query-options',
                                      DEFAULT_QUERY_OPTIONS)
+query_options = list(set(query_options))
+for option in UNSUPPORTED_OPTIONS:
+    if option in query_options:
+        logging.warning("query option %s is not supported and will be " +
+                        "ignored" % option)
+        query_options.remove(option)
+
 batch_size = get_optional_setting(config, site, 'query-batch-size',
                                   DEFAULT_QUERY_BATCH_SIZE)
 
