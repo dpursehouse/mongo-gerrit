@@ -1,6 +1,5 @@
-from __future__ import print_function
-
 import datetime
+import logging
 import sys
 from argparse import ArgumentParser
 from os.path import expanduser, isfile, join
@@ -22,7 +21,7 @@ CONFIG_FILENAME = 'mongo-gerrit.yml'
 
 
 def fatal(message):
-    print(message, file=sys.stderr)
+    logging.error(message)
     sys.exit(1)
 
 
@@ -38,6 +37,21 @@ def get_setting_with_default(config, site, setting, default):
     return default
 
 
+parser = ArgumentParser()
+parser.add_argument("site", help="Name of the Gerrit site to sync")
+parser.add_argument("--verbose", action="store_true",
+                    help="Enable verbose (debug) logging")
+group = parser.add_argument_group("database")
+group.add_argument("--database-hostname", action="store", default="localhost",
+                   dest="host", metavar="HOSTNAME", help="MongoDB hostname")
+group.add_argument("--database-port", action="store", default=27017, type=int,
+                   dest="port", metavar="PORT", help="MongoDB port")
+args = parser.parse_args()
+
+FORMAT = '%(asctime)-15s [%(levelname)s] %(message)s'
+level = logging.DEBUG if args.verbose else logging.INFO
+logging.basicConfig(format=FORMAT, level=level)
+
 config_file = CONFIG_FILENAME
 if not isfile(config_file):
     config_file = join(expanduser('~'), CONFIG_FILENAME)
@@ -52,15 +66,6 @@ except Exception as e:
 
 if "sites" not in config:
     fatal("no sites configured")
-
-parser = ArgumentParser()
-parser.add_argument("site", help="Name of the Gerrit site to sync")
-group = parser.add_argument_group("database")
-group.add_argument("--database-hostname", action="store", default="localhost",
-                   dest="host", metavar="HOSTNAME", help="MongoDB hostname")
-group.add_argument("--database-port", action="store", default=27017, type=int,
-                   dest="port", metavar="PORT", help="MongoDB port")
-args = parser.parse_args()
 
 site = args.site
 if site not in config['sites']:
@@ -81,8 +86,6 @@ else:
     terms = ["age:1day"]
 
 term_string = "?q=" + "+".join(terms)
-print(term_string)
-
 start_time = datetime.datetime.utcnow()
 start = 0
 limit = 300
@@ -91,11 +94,11 @@ while more_changes:
     query = "&".join([term_string] +
                      ["S=%d" % start, "n=%d" % limit] +
                      ["o=%s" % o for o in ALL_OPTIONS])
-    print(query)
+    logging.debug(query)
 
     results = gerrit.get("/changes/" + query)
     count = len(results)
-    print("fetched %d changes" % count)
+    logging.info("fetched %d changes" % count)
     if count:
         for change in results:
             print(change['id'])
@@ -105,5 +108,5 @@ while more_changes:
     else:
         more_changes = False
 
-print("database contains %d change records" % db.change_count())
+logging.info("database contains %d change records" % db.change_count())
 db.set_last_update(start_time)
