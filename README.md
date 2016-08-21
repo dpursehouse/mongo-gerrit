@@ -32,15 +32,36 @@ $ source ./ENV/bin/activate
 Configuration is done in a YAML file named `mongo-gerrit.yml` which may be
 located either in the user's home folder or the current directory.
 
-Multiple Gerrit servers may be configured in multiple blocks under the
+### Global settings
+
+Global settings are configured under the `settings` section.
+
+```yaml
+settings:
+ query-options:
+   - OPTION_NAME
+   - OPTION_NAME
+   - ...
+```
+
+- `query-options`: Options to be passed to Gerrit's [change query REST API]
+(https://gerrit-documentation.storage.googleapis.com/Documentation/2.12.3/rest-api-changes.html#list-changes).
+If not set, defaults to include almost all options (as arbitrarily decided by
+the author). May be overridden per site.
+
+### Gerrit server settings
+
+Settings for individual gerrit servers are configured in blocks under the
 `sites` section.
 
 ```yaml
----
 sites:
  site-name:
    url: https://example.com/review/
    auth: basic
+   query-options:
+     - OPTION_NAME
+     - OPTION_NAME
 ```
 
 - `site-name`: Unique identifier for this site. This will be used as the
@@ -48,6 +69,8 @@ database name in MongoDb.
 - `url`: Required. The fully qualified URL to the Gerrit server.
 - `auth`: Optional. Authentication type. May be `digest` or `basic`. Defaults to
 `digest` if not specified.
+- `query-options`: Optional. If specified, overrides the options defined in
+the global settings.
 
 The `mongo-gerrit.yml` file included in the repository defines configurations
 for [gerrit-review](https://gerrit-review.googlesource.com) and

@@ -1,4 +1,12 @@
 ---
+settings:
+  query-options:
+    - DETAILED_LABELS
+    - ALL_REVISIONS
+    - ALL_COMMITS
+    - DETAILED_ACCOUNTS
+    - MESSAGES
+    - COMMIT_FOOTERS
 sites:
  gerrit-review:
    url: https://gerrit-review.googlesource.com

@@ -11,8 +11,8 @@ from pygerrit2.rest.auth import HTTPBasicAuthFromNetrc, HTTPDigestAuthFromNetrc
 from db import GerritMongoDatabase
 
 
-ALL_OPTIONS = ['DETAILED_LABELS', 'ALL_REVISIONS', 'ALL_COMMITS',
-               'DETAILED_ACCOUNTS', 'MESSAGES', 'COMMIT_FOOTERS']
+DEFAULT_QUERY_OPTIONS = ['DETAILED_LABELS', 'ALL_REVISIONS', 'ALL_COMMITS',
+                         'DETAILED_ACCOUNTS', 'MESSAGES', 'COMMIT_FOOTERS']
 AUTH_METHODS = {
     'basic': HTTPBasicAuthFromNetrc,
     'digest': HTTPDigestAuthFromNetrc
@@ -31,9 +31,11 @@ def get_setting(config, site, setting):
     return config['sites'][site][setting]
 
 
-def get_setting_with_default(config, site, setting, default):
+def get_optional_setting(config, site, setting, default):
     if setting in config['sites'][site]:
         return config['sites'][site][setting]
+    if 'settings' in config and setting in config['settings']:
+        return config['settings'][setting]
     return default
 
 
@@ -72,9 +74,13 @@ if site not in config['sites']:
     fatal("no config for site %s" % site)
 
 url = get_setting(config, site, 'url')
-auth = get_setting_with_default(config, site, 'auth', 'digest')
+auth = get_optional_setting(config, site, 'auth', 'digest')
 if auth not in AUTH_METHODS:
     fatal("invalid authentication method %s" % auth)
+
+query_options = get_optional_setting(config, site,
+                                     'query-options',
+                                     DEFAULT_QUERY_OPTIONS)
 
 gerrit = GerritRestAPI(url=url, auth=AUTH_METHODS[auth](url=url))
 db = GerritMongoDatabase(name=site, host=args.host, port=args.port)
@@ -93,7 +99,7 @@ more_changes = True
 while more_changes:
     query = "&".join([term_string] +
                      ["S=%d" % start, "n=%d" % limit] +
-                     ["o=%s" % o for o in ALL_OPTIONS])
+                     ["o=%s" % o for o in query_options])
     logging.debug(query)
 
     results = gerrit.get("/changes/" + query)
