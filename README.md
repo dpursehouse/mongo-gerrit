@@ -54,7 +54,7 @@ to 500. May be overridden per site.
 
 ### Gerrit server settings
 
-Settings for individual gerrit servers are configured in blocks under the
+Settings for individual Gerrit servers are configured in blocks under the
 `sites` section.
 
 ```yaml
@@ -76,7 +76,7 @@ database name in MongoDb.
 - `query-options`: Optional. If specified, overrides the options defined in
 the global settings.
 - `query-batch-size`: Optional. If specified, overrides the value in the
-global settings. This should not be set to a value the exceeds the [query limit]
+global settings. This should not be set to a value that exceeds the [query limit]
 (https://gerrit-documentation.storage.googleapis.com/Documentation/2.12.3/access-control.html#capability_queryLimit)
 configured on the server.
 
