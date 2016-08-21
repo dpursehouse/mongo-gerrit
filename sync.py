@@ -64,7 +64,7 @@ try:
 except Exception as e:
     fatal('error opening config file: %s' % e)
 
-if "sites" not in config:
+if config is None or "sites" not in config:
     fatal("no sites configured")
 
 site = args.site
