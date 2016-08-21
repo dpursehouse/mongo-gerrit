@@ -59,7 +59,7 @@ if not isfile(config_file):
         fatal('no config file')
 
 try:
-    with open("mongo-gerrit.yml") as f:
+    with open(config_file) as f:
         config = yaml.load(f)
 except Exception as e:
     fatal('error opening config file: %s' % e)
