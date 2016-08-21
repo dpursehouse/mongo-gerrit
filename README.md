@@ -30,7 +30,12 @@ $ source ./ENV/bin/activate
 ## Configuration
 
 Configuration is done in a YAML file named `mongo-gerrit.yml` which may be
-located either in the user's home folder or the current directory.
+located either in the user's home folder or in the current directory.
+
+The `mongo-gerrit.yml` file included in the repository defines configurations
+for [gerrit-review](https://gerrit-review.googlesource.com) and
+[android-review](https://android-review.googlesource.com) and default global
+settings with reasonable values (as arbitrarily decided by the author).
 
 ### Global settings
 
@@ -48,12 +53,17 @@ settings:
 
 - `query-options`: Options to be passed to Gerrit's [change query REST API]
 (https://gerrit-documentation.storage.googleapis.com/Documentation/2.12.3/rest-api-changes.html#list-changes).
-If not set, defaults to include almost all options (as arbitrarily decided by
-the author). May be overridden per site.
-- `query-batch-size`: Number of changes to query per batch. If not set, defaults
-to 500. May be overridden per site.
+If not set, defaults to include almost all available options.
+- `query-batch-size`: Number of changes to query per batch. This should not be
+set to a value that exceeds the [query limit]
+(https://gerrit-documentation.storage.googleapis.com/Documentation/2.12.3/access-control.html#capability_queryLimit)
+configured on the server. If not set, defaults to 500 which is the default
+query limit on an out-of-the-box Gerrit installation.
 - `default-query`: Default query to use on initial sync. If not set, defaults
 to `age:1day`.
+
+All global settings may be overridden per server in the `sites` section (described
+below).
 
 ### Gerrit server settings
 
@@ -77,18 +87,6 @@ database name in MongoDb.
 - `url`: Required. The fully qualified URL to the Gerrit server.
 - `auth`: Optional. Authentication type. May be `digest` or `basic`. Defaults to
 `digest` if not specified.
-- `query-options`: Optional. If specified, overrides the options defined in
-the global settings.
-- `query-batch-size`: Optional. If specified, overrides the value in the
-global settings. This should not be set to a value that exceeds the [query limit]
-(https://gerrit-documentation.storage.googleapis.com/Documentation/2.12.3/access-control.html#capability_queryLimit)
-configured on the server.
-- `default-query`: Optional. If specified, overrides the value in the global
-settings.
-
-The `mongo-gerrit.yml` file included in the repository defines configurations
-for [gerrit-review](https://gerrit-review.googlesource.com) and
-[android-review](https://android-review.googlesource.com).
 
 ## Usage
 
